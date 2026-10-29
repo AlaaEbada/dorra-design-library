@@ -14,6 +14,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(SampleAccountSeeder::class);
+        $this->call(DesignLibrarySeeder::class);
     }
 }

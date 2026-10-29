@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480" role="img" aria-labelledby="title">
+  <title id="title">Dorra sample design thumbnail</title>
+  <rect width="640" height="480" fill="#f0ebe2"/>
+  <rect x="180" y="100" width="280" height="280" rx="24" fill="#d9c7a7"/>
+  <circle cx="320" cy="215" r="64" fill="#536259"/>
+  <path d="M240 330 320 250 400 330Z" fill="#faf8f3"/>
+</svg>

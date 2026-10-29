@@ -35,7 +35,7 @@ Create minimal schema and Eloquent relations without premature performance index
 - [x] Stop at `Awaiting Commit`; send changed files, results, issues and a suggested commit message.
 
 ## Completion record (2026-10-29)
-- Status: Awaiting Commit; Phase 04 NOT STARTED.
+- Status: Done; user confirmed commit and authorized Phase 04.
 - Created: app/Enums/DesignStatus.php; app/Models/Category.php; app/Models/Design.php; database/factories/CategoryFactory.php; database/factories/DesignFactory.php; database/migrations/2026_10_29_000001_create_categories_table.php; database/migrations/2026_10_29_000002_create_designs_table.php; tests/Feature/DesignSchemaTest.php.
 - Updated: docs/PLAN.md and this spec. Phase 02 spec updated to Done after explicit user confirmation of verified commit 8ae4c4c. Previous documentation corrections preserved.
 - Decisions: categories.name is required (not unique); designs.title/category_id/status/thumbnail/created_at are required; default status draft; created_at defaults to current time; category FK restricts deletion. No soft deletes, extra performance indexes or category CRUD.
@@ -73,4 +73,4 @@ CREATE TABLE `designs` (
 
 - Limitations: no HTTP CRUD/status screens yet; no performance measurement or MySQL-specific compatibility claims. No UI changes in this schema phase; requested visual improvements remain for the UI phase.
 - Suggested commit message: `feat: add design and category schema`
-- User commit confirmation / hash: pending. Agent did not stage, commit or push.
+- User commit confirmation / hash: user confirmed; verified 5c2518d with git log. Agent did not stage, commit or push.

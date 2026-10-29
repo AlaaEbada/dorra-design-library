@@ -1,4 +1,4 @@
-# Dorra � Design Library
+# Dorra — Design Library
 
 ## Phase 01: local environment
 
@@ -55,6 +55,47 @@ write endpoints to verify that the policy middleware returns 403 for Viewer.
 
 Run `php artisan test` (SQLite in-memory, isolated from the local sample database).
 Phase 02 result: 11 tests passed, 60 assertions. Browser verification NOT RUN.
+
+
+## Phase 04: reproducible local sample data
+
+Run `php artisan migrate`, then `php artisan db:seed --class=DesignLibrarySeeder`.
+The default `php artisan db:seed` now invokes this full sample seeder as well.
+Use only a local sample database, with design tables initially empty. The seeder
+rejects environments other than local/testing. Run offline with no concurrent
+writes or concurrent seeders. No automatic deletion/reset is performed.
+
+On the first run it creates 12 categories, the two documented demo accounts and
+exactly 100,000 designs in 1,000-row SQL insert batches inside one transaction.
+On an empty design table it reuses matching category names and refreshes the two
+sample accounts. A failed insert rolls back all row changes; MySQL auto-increment
+IDs may still advance, so reproducibility concerns content, not identical IDs.
+
+A run with exactly 100,000 existing designs is a no-op, including accounts and
+categories. This checks row count only, not content integrity or repairs. Any
+other nonzero design count is refused and preserved. For a new reproduction,
+configure a separate empty local sample database and migrate/seed there; retain
+the old database. Do not run destructive reset commands against existing data.
+Use `SampleAccountSeeder` separately if you intentionally need to restore the
+sample accounts after the dataset is complete.
+
+Titles are deterministic, split evenly between `Design sample 000001` style and
+Arabic `تصميم تجريبي 000002` style. Statuses are 50,000 draft / 50,000 published.
+Each category receives both languages and statuses. There are 50,000 distinct
+creation dates from 2025-01-01 00:00:00 to 2025-12-14 05:10:00, each repeated twice.
+All rows use `images/design-placeholder.svg`, shipped in public/images.
+`updated_at` is NULL until an edit: this avoids local TIMESTAMP daylight-saving
+conversion rejecting a historical sample time; `created_at` is DATETIME.
+
+Measured 2026-10-29 on local MariaDB 10.4.32: first successful project seed
+5.241 seconds, peak allocated PHP memory 62.00 MiB for that process. Independent
+empty verification database: 5.139 seconds, 56.00 MiB. These are seeding metrics,
+not query-performance benchmarks or total development time. Counts, title
+samples and a content checksum matched across both databases.
+
+Normal feature tests use a 28-row / 7-row-batch subclass on isolated SQLite,
+never the 100,000-row seeder. Full suite: 22 tests passed / 93 assertions.
+See docs/specs/04-sample-data.md for actual SQL and failure/retry evidence.
 
 ---
 
