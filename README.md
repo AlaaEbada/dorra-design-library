@@ -39,7 +39,7 @@ CREATE DATABASE dorra_sample CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 Edit the untracked `.env` with your local DB host, port, database, username and
 password. `.env.example` contains placeholders, not working database credentials.
-Keep `APP_ENV=local`; set `APP_URL=http://127.0.0.1:8015` for this run command.
+Keep `APP_ENV=local`; set `APP_URL=http://127.0.0.1:8000` for this run command.
 Do not set a conflicting `DB_URL`. Then run:
 
 ```powershell
@@ -47,10 +47,10 @@ php artisan key:generate
 php artisan config:clear
 php artisan migrate
 php artisan db:seed --class=DesignLibrarySeeder
-php artisan serve --host=127.0.0.1 --port=8015
+php artisan serve --host=127.0.0.1 --port=8000
 ```
 
-Open [the local login](http://127.0.0.1:8015/login).
+Open [the local login](http://127.0.0.1:8000/login).
 If the port is in use, select another port and update APP_URL accordingly.
 The application needs writable `storage` and `bootstrap/cache` directories.
 No external service, image upload, queue worker or storage symlink is required.
@@ -113,10 +113,11 @@ local sample database first. Never run it against existing valuable data.
 php artisan migrate:fresh --seed
 ```
 
-That destructive reset was NOT executed during final verification. The current
-performance dataset includes one user-approved replacement sample row after a
-manual delete; see the performance report. Preserve that dataset for reproducing
-the recorded comparison rather than reseeding it.
+That destructive reset was NOT executed during final verification. The local
+dataset includes one user-approved replacement sample row after a manual delete.
+The final audit found its checksum differs from the historical benchmark snapshot;
+the current data is not an identical reproduction. See the performance and audit
+reports; do not reseed the existing database to recreate historical results.
 
 ## Search behavior
 
@@ -150,7 +151,9 @@ vendor\bin\pint --test
 git diff --check
 ```
 
-Latest server run: **38 tests passed / 224 assertions** (2.41s).
+Latest verified isolated run: **49 tests passed / 277 assertions** (2.43s),
+using `php artisan test --do-not-cache-result`; 0 failed and 0 skipped.
+See the [recorded verification evidence](docs/specs/07-feature-tests.md#critical-audit-follow-up--a05--a03-2026-10-29).
 `vendor\bin\pint --test` and `git diff --check` passed. The temporary SPA
 enhancement and its tests were removed at the user's request.
 Feature tests use `RefreshDatabase` and SQLite `:memory:` configured in
@@ -182,9 +185,13 @@ These helpers require permission to CREATE DATABASE when creating verification D
 
 ## Handoff, scope and outstanding verification
 
+Actual development effort: approximately **2 hours** (user-reported).
+
 See [execution ledger](docs/PLAN.md) and individual [phase specs](docs/specs/).
-Phases 01–10 have verified user commits; the final implementation commit is
-`0f1457b`. Outstanding verification limitations below remain documented.
+Last implementation commit: `0f1457b`.
+Latest verified audit/test fixes commit: `2890191`.
+Subsequent uncommitted README corrections are not included in either commit.
+Outstanding verification limitations below remain documented.
 No commits or pushes are made automatically.
 
 Browser access was restored on 2026-10-29. Live checks on port 8000 verified
@@ -193,8 +200,9 @@ English prefix (500 results), page 2 preserving the prefix (24 cards), and Viewe
 403 on the Admin route. Admin login, management filters (21 results), loaded
 thumbnails, footer and create form were checked. Filter position settled at
 approximately 16px below viewport top with computed smooth scroll. No horizontal
-overflow at the observed 866x715 viewport. Live create/update/delete submissions,
-final mobile viewport checks and exhaustive visual testing remain NOT RUN;
+overflow at the observed 866x715 viewport. A later narrow-viewport audit found the
+library usable, with Admin overflow/confirmation scrolling requiring follow-up.
+Live create/update/delete submissions and exhaustive visual testing remain NOT RUN;
 write behavior is covered by isolated automated tests. Use a disposable sample
 database for live write tests to preserve the performance dataset.
 
