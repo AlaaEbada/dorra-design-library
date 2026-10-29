@@ -36,7 +36,7 @@ Implement fast server-side filtering and ordered 24-per-page listing.
 - [x] Stop at `Awaiting Commit`; send changed files, results, issues and a suggested commit message.
 
 ## Completion record (2026-10-29)
-- Status: Awaiting Commit; Phase 06 NOT STARTED.
+- Status: Done; user approved continuation after verified commit 4901b19.
 - Decision: user explicitly approved Prefix after explanation of Prefix vs Word vs Substring, and requested library/search UI improvements. Prior phase commit 8bd0025 verified; continuation approved and Phase 04 recorded Done.
 - Created: app/Http/Controllers/DesignListingController.php (thin invokable read controller); app/Http/Requests/DesignListingRequest.php (policy + query validation, safe redirect to clean index); public/css/library.css (responsive local styling); tests/Feature/DesignListingTest.php (small isolated datasets).
 - Modified: app/Models/Design.php (DB-side filter scope with bindings); routes/web.php (same protected library URL, now controller); resources/views/library.blade.php (filter form/cards/count/empty state/previous-next pagination); resources/views/layouts/base.blade.php (shared CSS link, responsive shell/skip link); README.md; docs/PLAN.md; this spec; Phase 04 spec (commit/approval closure). No CRUD, new indexes, dependencies or external assets.
@@ -76,4 +76,4 @@ select `id`, `name` from `categories` where `categories`.`id` in
 - Escaping: ! -> !!, % -> !%, _ -> !_; backslash remains literal with explicit ESCAPE '!'. Wildcard suffix appended after escaping. Uses bindings, no raw user interpolation. No contains/word search. Laravel trims surrounding query whitespace.
 - Limitations: MySQL server itself NOT RUN; no performance benchmark/EXPLAIN claimed in this phase, no extra index. Arabic hamza/diacritic variants may differ; SQLite collation is not MariaDB collation. Actual CRUD/Form Request write enforcement remains Phase 06.
 - Suggested commit: `feat: add design listing and prefix search`
-- User commit confirmation / hash: pending; no staging, commit or push by agent.
+- User approved continuation after commit; git log verified 4901b19. No staging, commit or push by agent.

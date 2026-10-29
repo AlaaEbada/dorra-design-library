@@ -1,12 +1,8 @@
 @extends('layouts.base')
 @section('page-class', 'library-shell')
 @section('content')
-<header class="topbar">
-    <a class="brand" href="{{ route('library') }}" aria-label="Dorra library home"><span class="brand-symbol" aria-hidden="true">d.</span><span>DORRA<small>DESIGN LIBRARY</small></span></a>
-    <div class="account"><span class="account-name">{{ auth()->user()->name }}</span><span class="role" @can('create', \App\Policies\LibraryPolicy::class) title="Administrator access enabled." @endcan>{{ ucfirst(auth()->user()->role->value) }}</span>
-        <form method="POST" action="{{ route('logout') }}">@csrf<button class="button button-quiet" type="submit">Sign out ↗</button></form>
-    </div>
-</header>
+@include('partials.library-header')
+@include('partials.flash')
 <section class="intro" aria-labelledby="page-title">
     <div><p class="eyebrow">A SPACE FOR CREATIVE WORK</p><h1 id="page-title">The design collection<span>.</span></h1><p class="intro-copy">Explore ideas, find inspiration, and make room for your next great design.</p></div>
     <div class="collection-note"><span class="note-mark" aria-hidden="true">✳</span><p>Thoughtfully collected.<br>Ready to inspire.</p></div>
@@ -21,13 +17,13 @@
     <div class="filter-footer"><p id="search-hint">Search matches the beginning of a title — in Arabic or English.</p><a class="text-link" href="{{ route('library') }}">Clear filters</a></div>
     @error('page')<p class="error" role="alert">{{ $message }}</p>@enderror
 </section>
-<div class="results-bar"><h2>All designs <span class="count">{{ number_format($designs->total()) }}</span></h2><span>Newest first <span aria-hidden="true">↓</span></span></div>
+<div class="results-bar"><h2>All designs <span class="count">{{ number_format($designs->total()) }}</span></h2><div class="result-actions"><span>Newest first <span aria-hidden="true">↓</span></span></div></div>
 @if($designs->isNotEmpty())
 <section class="design-grid" aria-label="Designs">
     @foreach($designs as $design)
     <article class="design-card">
         <div class="card-image"><img src="{{ asset($design->thumbnail) }}" alt="Shared placeholder thumbnail" width="640" height="480" loading="lazy"><span class="status status-{{ $design->status->value }}">{{ ucfirst($design->status->value) }}</span></div>
-        <div class="card-content"><p class="category">{{ $design->category->name }}</p><h3 dir="auto">{{ $design->title }}</h3><div class="card-meta"><time datetime="{{ $design->created_at->toDateString() }}">{{ $design->created_at->format('M d, Y') }}</time><span>#{{ $design->id }}</span></div></div>
+        <div class="card-content"><p class="category">{{ $design->category->name }}</p><h3 dir="auto"><a class="card-title" href="{{ route('designs.show', $design) }}">{{ $design->title }}</a></h3><div class="card-meta"><time datetime="{{ $design->created_at->toDateString() }}">{{ $design->created_at->format('M d, Y') }}</time><span>#{{ $design->id }}</span></div></div>
     </article>
     @endforeach
 </section>
