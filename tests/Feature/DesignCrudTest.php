@@ -94,6 +94,7 @@ class DesignCrudTest extends TestCase
         $this->actingAs($viewer)->post(route('designs.store'), $payload)->assertForbidden();
         $this->actingAs($viewer)->get(route('designs.edit', $design))->assertForbidden();
         $this->actingAs($viewer)->put(route('designs.update', $design), $payload)->assertForbidden();
+        $this->actingAs($viewer)->patch(route('designs.update', $design), $payload)->assertForbidden();
         $this->actingAs($viewer)->delete(route('designs.destroy', $design))->assertForbidden();
 
         $this->assertDatabaseMissing('designs', ['title' => 'Forged write']);
@@ -155,6 +156,50 @@ class DesignCrudTest extends TestCase
             ->assertSessionHasInput('status', 'archived');
 
         $this->assertSame($count, Design::count());
+    }
+
+    public function test_invalid_updates_leave_every_existing_attribute_unchanged(): void
+    {
+        $this->actingAs($this->account(Role::Admin));
+        $design = Design::factory()->create();
+        $original = $design->fresh()->getRawOriginal();
+
+        $this->from(route('designs.edit', $design))->patch(route('designs.update', $design), [
+            'title' => '',
+            'category_id' => 999999,
+            'status' => 'archived',
+        ])->assertRedirect(route('designs.edit', $design))
+            ->assertSessionHasErrors(['title', 'category_id', 'status']);
+
+        $this->assertSame($original, $design->fresh()->getRawOriginal());
+        $this->assertDatabaseCount('designs', 1);
+    }
+
+    public function test_title_length_boundary_is_enforced_on_create_and_update(): void
+    {
+        $this->actingAs($this->account(Role::Admin));
+        $category = Category::factory()->create();
+        $payload = ['category_id' => $category->id, 'status' => 'draft'];
+        $title = str_repeat('ت', 255);
+
+        $this->post(route('designs.store'), ['title' => $title] + $payload)
+            ->assertRedirect()->assertSessionHasNoErrors();
+        $design = Design::sole();
+        $this->assertSame($title, $design->title);
+
+        $this->post(route('designs.store'), ['title' => $title.'ت'] + $payload)
+            ->assertSessionHasErrors('title');
+        $this->assertDatabaseCount('designs', 1);
+
+        $updatedTitle = str_repeat('ع', 255);
+        $this->patch(route('designs.update', $design), ['title' => $updatedTitle] + $payload)
+            ->assertRedirect(route('admin.designs'))->assertSessionHasNoErrors();
+        $original = $design->fresh()->getRawOriginal();
+        $this->assertSame($updatedTitle, $original['title']);
+
+        $this->patch(route('designs.update', $design), ['title' => $updatedTitle.'ع'] + $payload)
+            ->assertSessionHasErrors('title');
+        $this->assertSame($original, $design->fresh()->getRawOriginal());
     }
 
     public function test_admin_can_delete_a_design(): void

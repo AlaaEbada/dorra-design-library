@@ -39,7 +39,7 @@ Deliver a reproducible, auditable standalone repository.
 - Files changed: README.md rewritten as handoff guide, .env.example app label, new scripts/verify-fresh-setup.php, docs/PLAN.md, this spec, Phase 09 commit confirmation.
 - Known issues / assumptions: total actual hands-on elapsed effort was never tracked and cannot be reconstructed; the corresponding task remains unchecked and README explicitly reports this. Final browser smoke blocked by disabled local browser control. Oracle MySQL, clean-machine dependency installation, optional Vite build and production deployment NOT RUN. Fresh database migration/seed verified using existing dependencies. Database verification helper leaves its new sample database for inspection. No private-key/token candidates found by limited heuristic search; .env is ignored and not tracked, sample credentials are explicitly local-only. This is not an exhaustive security audit.
 - Suggested commit message: `docs: finalize design library handoff`
-- User commit confirmation / hash: pending
+- User commit confirmation / hash: user confirmed; verified `0f1457b` (`feat: improve admin search and finalize library handoff`), clean worktree before closure documentation. Status: Done with the unverified checks and untracked-effort item retained.
 
 ## User-approved handoff revision
 

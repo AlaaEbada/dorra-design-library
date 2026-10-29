@@ -90,6 +90,32 @@ class DesignListingTest extends TestCase
         $this->get('/library?title=missing')->assertOk()->assertSee('No designs found')->assertSee('href="'.route('library').'"', false);
     }
 
+    public function test_clearing_filters_restores_the_default_listing(): void
+    {
+        $category = Category::factory()->create();
+        Design::factory()->count(25)->for($category)->published()->create(['title' => 'Design matching']);
+        Design::factory()->create(['title' => 'Other draft']);
+        $default = $this->get(route('library'))->assertOk()->viewData('designs');
+        $filtered = $this->get(route('library', [
+            'title' => 'Design', 'category_id' => $category->id, 'status' => 'published', 'page' => 2,
+        ]))->assertOk();
+        $this->assertSame(25, $filtered->viewData('designs')->total());
+        $this->assertSame(2, $filtered->viewData('designs')->currentPage());
+
+        $document = new \DOMDocument;
+        @$document->loadHTML($filtered->getContent());
+        $links = (new \DOMXPath($document))->query('//a[normalize-space(.)="Clear filters"]');
+        $this->assertSame(1, $links->length);
+        $resetUrl = $links->item(0)->getAttribute('href');
+        $this->assertSame(route('library'), $resetUrl);
+        $this->assertNull(parse_url($resetUrl, PHP_URL_QUERY));
+        $reset = $this->get($resetUrl)->assertOk()->viewData('designs');
+        $this->assertSame(26, $reset->total());
+        $this->assertSame(1, $reset->currentPage());
+        $this->assertCount(24, $reset);
+        $this->assertSame($default->pluck('id')->all(), $reset->pluck('id')->all());
+    }
+
     public function test_queries_fetch_a_page_and_category_in_one_eager_query(): void
     {
         Design::factory()->count(30)->for(Category::factory())->create();

@@ -67,9 +67,9 @@ NOT RUN. The helper creates a new timestamp-named local database and retains it.
 
 These credentials are public **local demo credentials only**. Never deploy them.
 
-| Role | Email | Password |
-|---|---|---|
-| Admin | admin@dorra.test | DorraSample123! |
+| Role   | Email             | Password        |
+| ------ | ----------------- | --------------- |
+| Admin  | admin@dorra.test  | DorraSample123! |
 | Viewer | viewer@dorra.test | DorraSample123! |
 
 Both roles can search/filter `/library` and view draft or published design
@@ -162,10 +162,10 @@ page size and query parameter preservation.
 [Performance evidence](docs/performance.md) records actual SQL/bindings,
 EXPLAIN, machine/settings, raw repeated timings and limitations. Local medians:
 
-| Query | Before indexes | After indexes |
-|---|---|---|
-| Category + status, newest first | 33.3196 ms | 0.9214 ms |
-| Title prefix, newest first | 108.8212 ms | 2.3891 ms |
+| Query                           | Before indexes | After indexes |
+| ------------------------------- | -------------- | ------------- |
+| Category + status, newest first | 33.3196 ms     | 0.9214 ms     |
+| Title prefix, newest first      | 108.8212 ms    | 2.3891 ms     |
 
 New BTREE indexes: `(category_id, status, created_at, id)` and `title`, delivered
 in a separate migration. These are warm local database/fetch measurements,
@@ -183,13 +183,9 @@ These helpers require permission to CREATE DATABASE when creating verification D
 ## Handoff, scope and outstanding verification
 
 See [execution ledger](docs/PLAN.md) and individual [phase specs](docs/specs/).
-Phases 01–09 have verified user commits. Phase 10 awaits final user review/commit.
+Phases 01–10 have verified user commits; the final implementation commit is
+`0f1457b`. Outstanding verification limitations below remain documented.
 No commits or pushes are made automatically.
-
-Total hands-on development effort was **not tracked**, so an actual total cannot
-be reconstructed reliably and no 4–6 hour estimate is presented as fact.
-Recorded command durations are measurements of those commands only, not effort.
-Work/evidence is dated 2026-10-29; Git timestamps are not timesheets.
 
 Browser access was restored on 2026-10-29. Live checks on port 8000 verified
 Viewer Arabic prefix + Branding/Published (21 results), empty results/reset,

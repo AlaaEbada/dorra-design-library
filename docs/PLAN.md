@@ -16,9 +16,12 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 | 07 | [Feature Tests](specs/07-feature-tests.md) | 06 | Done | User confirmed commit; verified `fc3bbe0`. |
 | 08 | [Performance Baseline](specs/08-performance-baseline.md) | 07 | Done | User confirmed commit; verified 34cdacb. |
 | 09 | [Indexes & Performance Comparison](specs/09-indexes-comparison.md) | 08 | Done | User confirmed commit; verified 59d770f. |
-| 10 | [README & Final Verification](specs/10-readme-handoff.md) | 09 | Awaiting Commit | 38 tests / 224 assertions; partial live browser smoke passed on 8000 (both role read journeys, filters, Viewer 403, Admin thumbnails/footer/create form). SPA removed. Live write/mobile and Oracle MySQL checks outstanding; effort untracked. |
+| 10 | [README & Final Verification](specs/10-readme-handoff.md) | 09 | Done | User confirmed commit 0f1457b; verified clean worktree before closure documentation. 38 tests / 224 assertions and partial live smoke recorded. Live write/mobile/Oracle MySQL remain unverified; total effort untracked. |
 
 ## Critical dependency constraints
+Post-audit A05/A03 follow-up (user-authorized, 2026-10-29): **Awaiting Commit**.
+Effective test configuration is guarded before RefreshDatabase; PHPUnit overrides inherited env/server values and tests expose only in-memory SQLite. Hostile-environment isolation proof: 8 tests / 19 assertions passed. Complete suite: 49 passed / 277 assertions, 2.43s; Pint and diff check passed. Viewer PATCH, invalid-update immutability, 255/256 title boundaries and following Clear filters are covered. See Phase 07 follow-up for commands, intermediate failures and file list. A01 was inspected only: actual Oracle MySQL verification remains NOT RUN; MariaDB settings, sample database and historical performance evidence were unchanged. No commit/push. Await user review/commit; do not proceed to another phase.
+
 - Keep extra performance indexes **out of Phase 03** so Phase 08 measures baseline on the identical 100,000-record dataset before Phase 09.
 - Confirm prefix search before implementing Phase 05; document limitations and UI hint.
 - Phase 07 uses small isolated test data and must not run Phase 04 bulk seeding inside tests.
@@ -65,7 +68,7 @@ Browser, frontend build and separate fresh setup NOT RUN.
 - [x] SQL, EXPLAIN and repeated before/after index measurements documented with real outputs.
 - [x] Actual feature-test command and results recorded.
 - [x] README and `.env.example` reviewed; credentials are sample-only; limited secret-pattern and tracked-file checks passed.
-- [ ] User confirms final commit/repository delivery.
+- [x] User confirms final commit/repository delivery: 0f1457b verified locally; no remote push or deployment claimed.
 
 Phase 01 commit confirmed by user and verified with git log/show: c28ce8482edd8a69101f7fa1b0dbab7a553b3add. User authorized Phase 02.
 
@@ -83,3 +86,15 @@ install, Oracle MySQL and optional frontend build NOT RUN. Actual total effort
 was not tracked, so that Phase 10 task and the aggregate acceptance gate remain
 unchecked. Limited secret-pattern search found no candidates; .env ignored and
 not tracked. Phase 10 awaits final user review/commit; no automatic commit made.
+
+### Closure — 2026-10-29
+
+User confirmed final implementation commit `0f1457b`; verified HEAD and clean
+worktree before this documentation update. All ten phase rows are closed with
+their recorded evidence. Browser access was later restored and partial final
+smoke passed as detailed in Phase 10 spec and README; earlier blocked notes above
+are historical. Outstanding checks remain explicitly unverified: live browser
+write submissions, final mobile viewport, Oracle MySQL, and clean-machine install.
+Actual total effort remains unavailable. The aggregate complete-verification gate
+stays unchecked. Only closure documentation changed after the user's commit;
+no application changes, automatic commit, push or deployment were performed.
