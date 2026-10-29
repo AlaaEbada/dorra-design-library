@@ -8,8 +8,8 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 | # | Module | Depends on | Status | Evidence / commit |
 |---|---|---|---|---|
 | 01 | [Environment & Setup](specs/01-environment-setup.md) | — | Done | User confirmed commit; verified c28ce8482edd8a69101f7fa1b0dbab7a553b3add. Working tree clean before Phase 02. |
-| 02 | [Authentication & Authorization](specs/02-auth-authorization.md) | 01 | Pending | — |
-| 03 | [Schema & Models](specs/03-schema-models.md) | 02 | Pending | — |
+| 02 | [Authentication & Authorization](specs/02-auth-authorization.md) | 01 | Done | User confirmed review/commit and authorized Phase 03; verified 8ae4c4c. |
+| 03 | [Schema & Models](specs/03-schema-models.md) | 02 | Awaiting Commit | Schema/models/factories verified; 18 tests / 73 assertions; fresh MariaDB verification and PK/FK-only indexes. See Phase 03 record. |
 | 04 | [Sample Data](specs/04-sample-data.md) | 03 | Pending | — |
 | 05 | [Listing & Search](specs/05-listing-search.md) | 04 | Pending | — |
 | 06 | [Design CRUD](specs/06-design-crud.md) | 05 | Pending | — |
@@ -29,6 +29,11 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 | Date | Phase | Change / proof | Blocker | Commit (verified) |
 |---|---|---|---|---|
 | 2026-10-29 | 01 | PHP 8.2.12, Laravel 12.70.2, Composer 2.7.9, Node 24.13.0, npm 11.7.0; platform check passed; MariaDB 10.4.32; initial migrations Ran; internal GET / 200; CSRF enabled | No Git repository; sample env still SQLite; existing app retained per user request | None verified |
+| 2026-10-29 | 02 | Additive role migration and sample account seeder succeeded on local MariaDB; 11 tests / 60 assertions; Pint and diff check passed | Browser not run; real CRUD enforcement deferred to Phase 06 | Awaiting user commit |
+| 2026-10-29 | 02 | Quick recheck: tests 11 passed / 60 assertions; Pint passed; staged diff check passed; four migrations Ran; expected five routes. Subsequent Git inspection found clean worktree and commit 8ae4c4c | Awaiting explicit user commit/review confirmation; Phase 03 not started | 8ae4c4c verified with git log |
+
+| 2026-10-29 | 02 | User explicitly confirmed review/commit and authorized Phase 03 | None for phase closure | 8ae4c4c verified |
+| 2026-10-29 | 03 | Schema/models/factories; fresh MariaDB migrations and constraints verified; local migrations Ran; PK/FK-only indexes; tests 18 passed / 73 assertions, Pint passed | No blocker; UI/CRUD/sample data deferred to their phases | Awaiting user commit |
 
 ## Phase 01 follow-up (2026-10-29)
 
@@ -49,5 +54,3 @@ Browser, frontend build and separate fresh setup NOT RUN.
 - [ ] User confirms final commit/repository delivery.
 
 Phase 01 commit confirmed by user and verified with git log/show: c28ce8482edd8a69101f7fa1b0dbab7a553b3add. User authorized Phase 02.
-
-| 2026-10-29 | 02 | Additive role migration and sample account seeder succeeded on local MariaDB; 11 tests / 60 assertions; Pint and diff check passed | Browser not run; real CRUD enforcement deferred to Phase 06 | Awaiting user commit |

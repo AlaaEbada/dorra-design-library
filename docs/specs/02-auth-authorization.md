@@ -34,7 +34,7 @@ Implement internal login and server-side Admin/Viewer access control.
 - [x] Stop at `Awaiting Commit`; send changed files, results, issues and a suggested commit message.
 
 ## Completion record (2026-10-29)
-- Status: Awaiting Commit. Phase 03 NOT STARTED.
+- Status: Done. User confirmed review/commit and authorized Phase 03.
 - Scope: internal login/logout only; configured Breeze Blade selectively from installed stubs, not the full installer. Simple server-rendered layout has no frontend build dependency. No unused auth controllers, routes or screens were generated.
 - Files created: app/Enums/Role.php; app/Http/Controllers/Auth/AuthenticatedSessionController.php; app/Http/Requests/Auth/LoginRequest.php; app/Policies/LibraryPolicy.php; database/migrations/2026_10_29_000000_add_role_to_users_table.php; database/seeders/SampleAccountSeeder.php; resources/views/layouts/base.blade.php; resources/views/auth/login.blade.php; resources/views/library.blade.php; tests/Feature/AuthorizationTest.php.
 - Files modified: app/Models/User.php (enum cast, role excluded from mass assignment); app/Providers/AppServiceProvider.php (policy registration); routes/web.php; database/seeders/DatabaseSeeder.php; tests/Feature/ExampleTest.php; composer.json/lock; README.md; docs/PLAN.md; this spec. Phase 01 spec also records user-confirmed verified commit c28ce8482edd8a69101f7fa1b0dbab7a553b3add.
@@ -53,4 +53,5 @@ Implement internal login and server-side Admin/Viewer access control.
 - Scope boundary: design records/status UI and CRUD do not exist until later phases. Actual CRUD routes, write Form Requests and Admin action links cannot be verified yet; policy write abilities are verified through test-only endpoints (not exposed by application). Admin-only shell content is verified. Connect policy to every future write endpoint/Form Request in Phase 06 and retest with real records.
 - Limitations: browser/network interaction and frontend build NOT RUN; MySQL server behavior NOT VERIFIED (local MariaDB). No production credentials introduced; README sample credentials are local-only. No commit performed by agent.
 - Suggested commit message: `feat: add internal auth and design roles`
-- User commit confirmation / hash: pending.
+- User commit confirmation: received; Commit `8ae4c4c` (`feat: add internal auth and design roles`) verified with `git log -1 --oneline`; working tree was clean before this documentation correction.
+- Quick recheck: `php artisan test` exit 0, 11 passed / 60 assertions; `vendor/bin/pint --dirty --test` passed; `git diff --cached --check` exit 0; route list shows expected five routes; migrate status shows all four migrations Ran. Corrected Phase 02 tracker from Pending to Awaiting Commit and moved its work-log row into the table. No application changes.
