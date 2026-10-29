@@ -111,3 +111,130 @@ then succeeded. The successful run above is the baseline source.
 Quick Phase 06/07 regression review: `php artisan test` passed 36 tests / 209
 assertions (2.89s), and `vendor\bin\pint --test` passed before the benchmark script
 was added. No regression was observed in those checks.
+
+## After indexes — 2026-10-29 (Phase 09)
+
+Migration: `2026_10_29_160000_add_design_performance_indexes.php`.
+Applied successfully using:
+
+```powershell
+php artisan migrate --path=database/migrations/2026_10_29_160000_add_design_performance_indexes.php
+php scripts/performance-baseline.php
+```
+
+The same benchmark script was run immediately before and after migration.
+Exact count remained 100000, checksum remained **3289254657**, matched counts
+remained 4168 and 500, and both queries still returned 24 rows. SQL, bindings,
+offset, sorting, PHP/DB versions, buffer pool, collation, query cache OFF and
+measurement method were unchanged from Phase 08. The machine was the same.
+Background load was not controlled; these warm local runs are illustrative,
+not a production latency guarantee. Index creation itself warms database pages.
+
+### Index choice and actual SHOW INDEX result
+
+The composite `(category_id, status, created_at, id)` places the two equality
+predicates first and the ordering columns next. With both first columns fixed,
+the server can traverse the index backwards for the descending order and LIMIT.
+The title BTREE supports the confirmed literal prefix search. A title range
+does not also provide global creation-date ordering, so filesort can remain.
+
+Actual post-migration `SHOW INDEX` returned the following BTREE entries (all
+ascending, no prefix truncation, non-null columns):
+
+| Key | Unique | Sequence | Column | Cardinality estimate |
+|---|---|---|---|---|
+| PRIMARY | Yes | 1 | id | 99510 |
+| designs_category_status_created_id_index | No | 1 | category_id | 22 |
+| designs_category_status_created_id_index | No | 2 | status | 46 |
+| designs_category_status_created_id_index | No | 3 | created_at | 99510 |
+| designs_category_status_created_id_index | No | 4 | id | 99510 |
+| designs_title_index | No | 1 | title | 99510 |
+
+MariaDB automatically removed the redundant, automatically created
+`designs_category_id_foreign` index when the composite became available to
+support the FK. The migration does not drop the FK or PK. Its `down()` recreates
+the standalone category index when absent before dropping the composite, so
+FK support is retained. Rollback and reapplication were subsequently verified
+on a separate local database; see the follow-up below.
+
+### Actual post-index EXPLAIN
+
+Category/status, exact SQL and bindings from the baseline:
+
+```json
+{"id":1,"select_type":"SIMPLE","table":"designs","type":"ref","possible_keys":"designs_category_status_created_id_index","key":"designs_category_status_created_id_index","key_len":"9","ref":"const,const","rows":"4168","Extra":"Using where"}
+```
+
+Prefix-title, exact SQL and binding from the baseline:
+
+```json
+{"id":1,"select_type":"SIMPLE","table":"designs","type":"range","possible_keys":"designs_title_index","key":"designs_title_index","key_len":"1022","ref":null,"rows":"500","Extra":"Using index condition; Using filesort"}
+```
+
+EXPLAIN ANALYZE was NOT RUN. Estimates are not actual visited-row counts.
+
+### Raw measurements and comparison
+
+The immediate pre-migration rerun (same original plans and indexes) recorded:
+
+- Category/status ms: `37.5944, 30.4656, 38.1780, 28.4277, 33.5166, 38.4311, 35.0648, 218.7172, 109.5546, 39.2378`; median **37.8862**.
+- Prefix ms: `98.2005, 123.8229, 127.4132, 108.8691, 133.1295, 108.2347, 127.1120, 128.7318, 129.8551, 131.0868`; median **127.2626**.
+
+Post-migration values:
+
+- Category/status ms: `0.9247, 0.9181, 0.8570, 0.7753, 1.1447, 1.3012, 0.8111, 0.8278, 1.0035, 0.9255`; median **0.9214**.
+- Prefix ms: `2.3521, 2.1372, 3.0115, 3.2940, 2.0098, 1.0330, 2.4949, 2.3130, 2.4398, 2.4261`; median **2.3891**.
+
+| Query | Phase 08 median ms | Immediate pre-index median ms | After median ms |
+|---|---|---|---|
+| Category/status | 33.3196 | 37.8862 | 0.9214 |
+| Title prefix | 108.8212 | 127.2626 | 2.3891 |
+
+Both measured queries improved locally; no regression was observed for these
+two fixed predicates. Category/status no longer reports filesort. Prefix search
+still reports filesort, but narrows the estimated candidate set from 99510 to
+500. Broad prefixes can be less selective and the optimizer may choose a scan;
+these results do not establish speedups for every prefix/filter combination.
+No end-to-end HTTP or pagination COUNT speedup is claimed.
+
+### Storage, writes and scaling
+
+Reported index storage increased from 3686400 to **12107776 bytes**, a net
+increase of **8421376 bytes** (approximately 8.03 MiB). Data length remained
+11026432 bytes. Allocation and statistics are server metadata, not exact
+per-index payload measurements. Extra indexes cost storage and buffer-pool
+space, and must be maintained during insert/delete and indexed-column updates;
+write throughput was NOT benchmarked.
+
+At one million rows, deep OFFSET still walks/skips many matching entries and
+COUNT can dominate pagination. Consider keyset/cursor pagination using
+`(created_at, id)` when numbered pages are unnecessary; it changes the UI's
+pagination contract and is not implemented here. COUNT caching or avoiding total
+counts requires an explicit consistency/product choice. Recheck selectivity,
+plans, buffer-pool sizing and realistic Arabic/English workloads on actual data.
+A dedicated search engine is only a future option if requirements expand to
+fuzzy/full-text search; the current project keeps MySQL prefix search.
+
+Verification: forward migration passed; `php artisan test` passed **36 tests /
+209 assertions**, duration 2.29s; `vendor\bin\pint --test` and `git diff --check`
+passed. No application query semantics were changed.
+
+### Rollback verification follow-up
+
+`php scripts/verify-index-rollback.php` passed on separate database
+`dorra_index_verify_20261029_115223`, using a single design and category fixture.
+The script creates a new timestamp-named database using the local connection,
+then explicitly selects it for all migration and fixture operations. The
+database is retained for inspection; no cleanup/drop was performed.
+
+- Initial migration exit: 0; composite and title indexes present.
+- Targeted `migrate:rollback --step=1 --path=database/migrations/2026_10_29_160000_add_design_performance_indexes.php` exit: 0.
+- After rollback, actual `SHOW INDEX` showed only PRIMARY(id) and `designs_category_id_foreign(category_id)`.
+- Attempted deletion of the used fixture category was rejected with MariaDB FK error 1451, verifying FK enforcement after rollback.
+- Targeted migration reapplication exit: 0; composite and title indexes present again.
+- Fixture count remained 1; checksum before, after rollback, and after reapplication: **3758889467**.
+- After reapplication MariaDB retained the now-explicit standalone category index as well as the composite. This differs from its removal of the original automatically generated FK index on the first application; rollback correctness is unaffected.
+
+Browser smoke follow-up: NOT RUN. The browser tool returned
+`Local browser use is disabled in Work settings`. Search/filter/CRUD browser
+journeys still need manual verification or enabled browser access.

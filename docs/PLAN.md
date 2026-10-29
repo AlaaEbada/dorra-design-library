@@ -14,8 +14,8 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 | 05 | [Listing & Search](specs/05-listing-search.md) | 04 | Done | User approved continuation after commit 4901b19; git log verified; clean worktree before Phase 06. |
 | 06 | [Design CRUD](specs/06-design-crud.md) | 05 | Done | User confirmed commit; verified `0db04ab`. |
 | 07 | [Feature Tests](specs/07-feature-tests.md) | 06 | Done | User confirmed commit; verified `fc3bbe0`. |
-| 08 | [Performance Baseline](specs/08-performance-baseline.md) | 07 | Awaiting Commit | 100000 rows; original indexes, SQL/bindings, EXPLAIN and ten timings/query recorded in docs/performance.md; awaiting review/commit. |
-| 09 | [Indexes & Performance Comparison](specs/09-indexes-comparison.md) | 08 | Pending | — |
+| 08 | [Performance Baseline](specs/08-performance-baseline.md) | 07 | Done | User confirmed commit; verified 34cdacb. |
+| 09 | [Indexes & Performance Comparison](specs/09-indexes-comparison.md) | 08 | Awaiting Commit | Index measurement documented; 36 tests / 209 assertions passed. Separate MariaDB rollback/reapply and FK preservation verified. Browser access disabled; awaiting user commit. |
 | 10 | [README & Final Verification](specs/10-readme-handoff.md) | 09 | Pending | — |
 
 ## Critical dependency constraints
@@ -45,6 +45,11 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 | 2026-10-29 | 08 | Initial read-only count found 99999; user subsequently approved one replacement sample record (133001), restoring 100000. Baseline recorded with checksum 3289254657: category/status median 33.3196 ms; prefix median 108.8212 ms; ten runs each, EXPLAIN and PK/FK indexes documented. Phase 06/07 regression tests: 36 passed / 209 assertions; Pint passed | No blocker; preserve dataset for Phase 09 | Awaiting user commit |
 
 ## Phase 01 follow-up (2026-10-29)
+
+Phase 08 commit confirmed by user and verified: `34cdacb`. Phase 09 applied only
+performance indexes on the same 100000-row local dataset (checksum 3289254657).
+Observed post-index medians: 0.9214 ms category/status, 2.3891 ms prefix;
+full evidence and limitations in `docs/performance.md`. Awaiting user commit.
 
 User authorized Git initialization and sample env update. `git init` succeeded;
 `.env.example` uses mysql placeholders; README documents local setup and MariaDB.

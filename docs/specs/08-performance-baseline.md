@@ -37,4 +37,4 @@ Collect reproducible before-index evidence on 100,000 rows before adding custom 
 - Files changed: `scripts/performance-baseline.php`, `docs/performance.md`, this spec, `docs/PLAN.md`, and Phase 07 commit confirmation.
 - Known issues / assumptions: user-approved replacement sample row 133001 restored count to 100000 before measurement; dataset checksum 3289254657 must be preserved for Phase 09. Warm local measurements include PDO fetch overhead; no controlled cold-cache benchmark. Initial shell quoting and SHOW metadata failures are recorded in the report. Status: Awaiting Commit.
 - Suggested commit message: `perf: document design query baseline`
-- User commit confirmation / hash: pending
+- User commit confirmation / hash: user confirmed; verified `34cdacb`.
