@@ -26,6 +26,36 @@ Phase 01 verification used an internal HTTP request returning 200 and confirmed
 CSRF middleware is enabled. See `docs/specs/01-environment-setup.md` for evidence.
 Authentication and library features belong to later phases.
 
+## Phase 02: internal authentication
+
+Open `/login` after starting the server. Only login/logout are exposed; there is
+no public registration, password recovery or profile management.
+
+Local sample credentials only (never use these accounts on a deployed service):
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@dorra.test | DorraSample123! |
+| Viewer | viewer@dorra.test | DorraSample123! |
+
+Run `php artisan migrate`, then `php artisan db:seed --class=SampleAccountSeeder`
+for the local sample accounts. The seeder is restricted to local/testing and
+resets these two sample accounts to the documented roles/passwords on repeat runs.
+Passwords are stored hashed. Existing unrelated users are retained and receive
+the viewer default when the role migration runs.
+
+Breeze 2.4.0 login controller and throttled Form Request are configured selectively
+with Blade views; the full scaffolder was not run, avoiding unused auth routes
+and frontend dependency replacements. The simple login shell needs no Vite build.
+`LibraryPolicy` controls access; `/library` requires authentication and read
+permission. Admin-only content uses the same policy in Blade. Design CRUD routes,
+write Form Requests, model policies and action links will be connected when those
+features are introduced in their assigned phases. Phase 02 tests use test-only
+write endpoints to verify that the policy middleware returns 403 for Viewer.
+
+Run `php artisan test` (SQLite in-memory, isolated from the local sample database).
+Phase 02 result: 11 tests passed, 60 assertions. Browser verification NOT RUN.
+
 ---
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>

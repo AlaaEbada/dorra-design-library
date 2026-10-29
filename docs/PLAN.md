@@ -7,7 +7,7 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 
 | # | Module | Depends on | Status | Evidence / commit |
 |---|---|---|---|---|
-| 01 | [Environment & Setup](specs/01-environment-setup.md) | — | Awaiting Commit | Environment and HTTP 200 verified; Git initialized, mysql sample env and startup docs reviewed. No commit yet. See Phase 01 record. |
+| 01 | [Environment & Setup](specs/01-environment-setup.md) | — | Done | User confirmed commit; verified c28ce8482edd8a69101f7fa1b0dbab7a553b3add. Working tree clean before Phase 02. |
 | 02 | [Authentication & Authorization](specs/02-auth-authorization.md) | 01 | Pending | — |
 | 03 | [Schema & Models](specs/03-schema-models.md) | 02 | Pending | — |
 | 04 | [Sample Data](specs/04-sample-data.md) | 03 | Pending | — |
@@ -47,3 +47,7 @@ Browser, frontend build and separate fresh setup NOT RUN.
 - [ ] Actual feature-test command and results recorded.
 - [ ] README and `.env.example` reviewed; credentials are sample-only; no secrets.
 - [ ] User confirms final commit/repository delivery.
+
+Phase 01 commit confirmed by user and verified with git log/show: c28ce8482edd8a69101f7fa1b0dbab7a553b3add. User authorized Phase 02.
+
+| 2026-10-29 | 02 | Additive role migration and sample account seeder succeeded on local MariaDB; 11 tests / 60 assertions; Pint and diff check passed | Browser not run; real CRUD enforcement deferred to Phase 06 | Awaiting user commit |
