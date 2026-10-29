@@ -43,4 +43,4 @@ Implement Admin create/show/edit/update/delete safely and predictably.
 - Files changed: `app/Http/Controllers/DesignController.php`, `app/Http/Requests/StoreDesignRequest.php`, `app/Http/Requests/UpdateDesignRequest.php`, `app/Policies/DesignPolicy.php`, `app/Providers/AppServiceProvider.php`, `routes/web.php`, the Admin dashboard and CRUD Blade views/partials, library CSS/view, `tests/Feature/DesignCrudTest.php`, and phase documentation. The dashboard shows a fixed shared thumbnail beside every design, and status badges are scoped to library cards.
 - Known issues / assumptions: at user request, Admin management is consolidated in the separate `/admin/designs` dashboard; the library and shared details page remain read-only. Browser smoke test was NOT RUN because local browser control is disabled in the Work settings; feature tests use an isolated temporary database and do not modify the local 100,000-row sample dataset.
 - Suggested commit message: `feat: implement policy-protected design CRUD`
-- User commit confirmation / hash: pending
+- User commit confirmation / hash: user confirmed; verified `0db04ab` (`feat: add separate admin design dashboard`).

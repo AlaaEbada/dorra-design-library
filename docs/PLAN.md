@@ -12,8 +12,8 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 | 03 | [Schema & Models](specs/03-schema-models.md) | 02 | Done | User confirmed commit 5c2518d and authorized Phase 04; git log verified. |
 | 04 | [Sample Data](specs/04-sample-data.md) | 03 | Done | User approved continuation after verified commit 8bd0025; 100k dataset evidence in Phase 04. |
 | 05 | [Listing & Search](specs/05-listing-search.md) | 04 | Done | User approved continuation after commit 4901b19; git log verified; clean worktree before Phase 06. |
-| 06 | [Design CRUD](specs/06-design-crud.md) | 05 | Awaiting Commit | Separate Admin design dashboard, Viewer server-side denial, and isolated feature tests verified; awaiting user review/commit. |
-| 07 | [Feature Tests](specs/07-feature-tests.md) | 06 | Pending | — |
+| 06 | [Design CRUD](specs/06-design-crud.md) | 05 | Done | User confirmed commit; verified `0db04ab`. |
+| 07 | [Feature Tests](specs/07-feature-tests.md) | 06 | Awaiting Commit | Isolated feature coverage verified; awaiting user review/commit. |
 | 08 | [Performance Baseline](specs/08-performance-baseline.md) | 07 | Pending | — |
 | 09 | [Indexes & Performance Comparison](specs/09-indexes-comparison.md) | 08 | Pending | — |
 | 10 | [README & Final Verification](specs/10-readme-handoff.md) | 09 | Pending | — |
@@ -39,6 +39,8 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 | 2026-10-29 | 04 | User approved continuation after verified sample dataset commit | None for closure | 8bd0025 verified |
 | 2026-10-29 | 05 | Prefix approved; listing/filter/UI, SQL page evidence, MariaDB literal modes/collation and browser responsive smoke; tests 29 passed / 144 assertions; Pint passed | No blocker; MySQL-specific benchmark deferred | Awaiting user commit |
 | 2026-10-29 | 06 | CRUD resource routes, Form Requests, explicit policy registration, separate `/admin/designs` dashboard with thumbnail rows and card-scoped status badges, shared placeholder thumbnail, and isolated `DesignCrudTest`; 36 tests / 209 assertions, Pint and diff check passed | Browser smoke unavailable because local browser control is disabled in Work settings; awaiting user review/commit | Awaiting user commit |
+| 2026-10-29 | 06 | User confirmed commit and authorized Phase 07; `0db04ab` verified with git log | None | `0db04ab` verified |
+| 2026-10-29 | 07 | `php artisan test` passed: 36 tests / 209 assertions in 2.25s; isolated SQLite in-memory configuration and required role/CRUD/search/listing coverage verified | No blocker; awaiting user review/commit | Awaiting user commit |
 
 ## Phase 01 follow-up (2026-10-29)
 
