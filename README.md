@@ -97,6 +97,45 @@ Normal feature tests use a 28-row / 7-row-batch subclass on isolated SQLite,
 never the 100,000-row seeder. Full suite: 22 tests passed / 93 assertions.
 See docs/specs/04-sample-data.md for actual SQL and failure/retry evidence.
 
+
+## Phase 05: library listing and title prefix search
+
+Open `/library` after login. Both Admin and Viewer can browse draft and published
+designs. The responsive Blade UI provides a title prefix search, category/status
+filters (combined with AND), clear action, empty state and field-level errors.
+Query parameters: `title`, `category_id`, `status`, `page`; title max 255 characters.
+Invalid browser query parameters redirect to the clean library URL with errors;
+JSON validation uses Laravel's normal 422 response. Blank filters are ignored.
+
+Prefix search was explicitly approved by the user: `Design` matches titles
+starting with Design; `sample` does not match Design sample. `تصميم` matches
+تصميم تجريبي. Leading/trailing input whitespace is trimmed by Laravel. This is
+neither whole-word nor substring/fuzzy search. SQL uses a bound pattern plus
+`ESCAPE '!'`; !, % and _ are escaped and backslash stays literal. Literal-symbol
+queries were verified on MariaDB in normal and NO_BACKSLASH_ESCAPES session modes.
+
+Actual title collation: utf8mb4_unicode_ci on MariaDB 10.4.32. Direct probes:
+Design/design and Café/Cafe match; أمل/امل and تَصميم/تصميم do not. No custom Arabic
+normalization or diacritic removal is applied; other variants depend on database
+collation. SQLite tests do not prove MariaDB collation behavior; MySQL itself
+has not been tested. A future Arabic normalization decision would change search
+semantics and should be discussed separately.
+
+Results order by created_at DESC, id DESC, 24 per page, with query parameters
+preserved. Eager loading fetches categories in one query instead of one per card.
+A live request against the 100,000-row local dataset returned HTTP 200 and exactly
+24 cards. Captured SQL shows count + LIMIT 24/OFFSET page + category queries;
+no full-dataset materialization. No performance index was added; speed benchmarks
+remain in Phases 08/09. CRUD and detail pages belong to Phase 06.
+
+Verification: 29 tests / 144 assertions passed. Browser smoke checks covered
+Admin/Viewer login, Arabic combined filters, next page preserving filters, reset,
+empty results and sign out. Desktop 1365×900 and mobile 390×844 inspected, with
+no horizontal overflow in DOM measurements. Styles are local public/css/library.css,
+with no CDN, JavaScript framework or build requirement. Shared layout styling also
+updates the existing login shell. This is a smoke check, not a full accessibility
+audit or exhaustive browser matrix.
+
 ---
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>

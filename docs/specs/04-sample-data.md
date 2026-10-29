@@ -33,7 +33,7 @@ Create a reproducible local 100k-design dataset without memory-heavy seeding.
 - [x] Stop at `Awaiting Commit`; send changed files, results, issues and a suggested commit message.
 
 ## Completion record (2026-10-29)
-- Status: Awaiting Commit. Phase 05 NOT STARTED; prefix search still needs user confirmation at that phase.
+- Status: Done. User approved continuation and Prefix for Phase 05 after verified commit 8bd0025.
 - Created: database/seeders/DesignLibrarySeeder.php; public/images/design-placeholder.svg; tests/Feature/SampleDataTest.php.
 - Modified: database/seeders/DatabaseSeeder.php (default full local sample seed); README.md (commands, safety/idempotence behavior, metrics, small-test strategy; corrected malformed title encoding); docs/PLAN.md; this spec; Phase 03 spec (Done after user-confirmed verified commit 5c2518d).
 - Implementation: local/testing guard, one transaction, 1,000-row bounded insert batches (100 batches), query log disabled, deterministic content and fixed base date, 12 category IDs only held in memory. No 100k model creation/materialization. Each category has both languages/statuses. One code-native SVG asset, shared by all designs; no downloads/uploads.
@@ -79,4 +79,4 @@ SELECT title,status,thumbnail,created_at FROM designs ORDER BY id LIMIT 4;
 - Category count via Category::count(): 12 in each DB. Both accounts: admin@dorra.test and viewer@dorra.test, expected roles, documented local-only password verified hashed. No secrets printed.
 - Limitations: MySQL server itself and browser rendering NOT RUN; live library list does not exist until Phase 05. No performance indexes added; no query benchmarks claimed. Peak memory is process-wide allocation, not incremental dataset memory; no total developer time claimed.
 - Suggested commit: `feat: seed design library sample dataset`
-- User commit confirmation / hash: pending; no staging/commit/push by agent.
+- User approval received; commit 8bd0025 verified with git log. No staging/commit/push by agent.

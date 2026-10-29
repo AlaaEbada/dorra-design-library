@@ -10,8 +10,8 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 | 01 | [Environment & Setup](specs/01-environment-setup.md) | — | Done | User confirmed commit; verified c28ce8482edd8a69101f7fa1b0dbab7a553b3add. Working tree clean before Phase 02. |
 | 02 | [Authentication & Authorization](specs/02-auth-authorization.md) | 01 | Done | User confirmed review/commit and authorized Phase 03; verified 8ae4c4c. |
 | 03 | [Schema & Models](specs/03-schema-models.md) | 02 | Done | User confirmed commit 5c2518d and authorized Phase 04; git log verified. |
-| 04 | [Sample Data](specs/04-sample-data.md) | 03 | Awaiting Commit | 100000 designs / 12 categories verified on two local MariaDB databases; 5.241s project seed; 22 tests / 93 assertions, safe rerun. See Phase 04 record. |
-| 05 | [Listing & Search](specs/05-listing-search.md) | 04 | Pending | — |
+| 04 | [Sample Data](specs/04-sample-data.md) | 03 | Done | User approved continuation after verified commit 8bd0025; 100k dataset evidence in Phase 04. |
+| 05 | [Listing & Search](specs/05-listing-search.md) | 04 | Awaiting Commit | User-approved Prefix; paged eager-loaded listing, validated AND filters, responsive UI; MariaDB literal/collation probes; browser smoke; 29 tests / 144 assertions. See Phase 05. |
 | 06 | [Design CRUD](specs/06-design-crud.md) | 05 | Pending | — |
 | 07 | [Feature Tests](specs/07-feature-tests.md) | 06 | Pending | — |
 | 08 | [Performance Baseline](specs/08-performance-baseline.md) | 07 | Pending | — |
@@ -33,9 +33,11 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 | 2026-10-29 | 02 | Quick recheck: tests 11 passed / 60 assertions; Pint passed; staged diff check passed; four migrations Ran; expected five routes. Subsequent Git inspection found clean worktree and commit 8ae4c4c | Awaiting explicit user commit/review confirmation; Phase 03 not started | 8ae4c4c verified with git log |
 | 2026-10-29 | 02 | User explicitly confirmed review/commit and authorized Phase 03 | None for phase closure | 8ae4c4c verified |
 | 2026-10-29 | 03 | Schema/models/factories; fresh MariaDB migrations and constraints verified; local migrations Ran; PK/FK-only indexes; tests 18 passed / 73 assertions, Pint passed | No blocker; UI/CRUD/sample data deferred to their phases | Awaiting user commit |
-
 | 2026-10-29 | 03 | User confirmed commit and authorized Phase 04 | None | 5c2518d verified |
 | 2026-10-29 | 04 | Chunked deterministic seed, shared SVG; project and empty verification DB each 100000 designs, 12 categories, both accounts/statuses/languages; safe rerun; 22 tests / 93 assertions | No blocker; browser/listing not yet implemented | Awaiting user commit |
+
+| 2026-10-29 | 04 | User approved continuation after verified sample dataset commit | None for closure | 8bd0025 verified |
+| 2026-10-29 | 05 | Prefix approved; listing/filter/UI, SQL page evidence, MariaDB literal modes/collation and browser responsive smoke; tests 29 passed / 144 assertions; Pint passed | No blocker; MySQL-specific benchmark deferred | Awaiting user commit |
 
 ## Phase 01 follow-up (2026-10-29)
 
