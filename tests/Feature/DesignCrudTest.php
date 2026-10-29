@@ -168,4 +168,32 @@ class DesignCrudTest extends TestCase
 
         $this->assertDatabaseMissing('designs', ['id' => $design->id]);
     }
+
+    public function test_admin_search_combines_filters_and_preserves_pagination(): void
+    {
+        $this->actingAs($this->account(Role::Admin));
+        $category = Category::factory()->create();
+        Design::factory()->count(25)->for($category)->published()->create(['title' => 'Design matching', 'created_at' => '2025-01-01 00:00:00']);
+        Design::factory()->for($category)->create(['title' => 'Design draft']);
+        Design::factory()->published()->create(['title' => 'Other title']);
+        $filters = ['title' => 'Design', 'category_id' => $category->id, 'status' => 'published'];
+        $page = $this->get(route('admin.designs', $filters))->assertOk()->viewData('designs');
+        $this->assertSame(25, $page->total());
+        $this->assertCount(24, $page);
+        parse_str(parse_url($page->nextPageUrl(), PHP_URL_QUERY), $parameters);
+        $this->assertEquals($filters, array_intersect_key($parameters, $filters));
+        $this->get($page->nextPageUrl())->assertOk()->assertViewHas('designs', fn ($designs) => count($designs) === 1);
+    }
+
+    public function test_admin_arabic_search_empty_state_and_invalid_filters(): void
+    {
+        $this->actingAs($this->account(Role::Admin));
+        Design::factory()->create(['title' => 'تصميم عربي']);
+        Design::factory()->create(['title' => 'هذا تصميم عربي']);
+        $this->get(route('admin.designs', ['title' => 'تصميم']))->assertOk()
+            ->assertViewHas('designs', fn ($designs) => $designs->total() === 1);
+        $this->get(route('admin.designs', ['title' => 'missing']))->assertOk()->assertSee('No designs found');
+        $this->get(route('admin.designs', ['status' => 'bad', 'page' => 0]))
+            ->assertRedirect(route('admin.designs'))->assertSessionHasErrors(['status', 'page']);
+    }
 }

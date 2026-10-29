@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdminDesignListingRequest;
 use App\Http\Requests\StoreDesignRequest;
 use App\Http\Requests\UpdateDesignRequest;
 use App\Models\Category;
@@ -14,16 +15,19 @@ class DesignController extends Controller
 {
     private const THUMBNAIL = 'images/design-placeholder.svg';
 
-    public function index(): View
+    public function index(AdminDesignListingRequest $request): View
     {
         Gate::authorize('create', Design::class);
 
         return view('admin.designs.index', [
+            'filters' => $request->validated(),
+            'categories' => Category::orderBy('name')->get(['id', 'name']),
             'designs' => Design::query()
+                ->filter($request->validated())
                 ->with('category:id,name')
                 ->orderByDesc('created_at')
                 ->orderByDesc('id')
-                ->paginate(24),
+                ->paginate(24)->withQueryString(),
         ]);
     }
 

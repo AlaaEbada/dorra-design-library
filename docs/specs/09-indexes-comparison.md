@@ -39,4 +39,4 @@ Use actual baseline plans to add justified indexes and compare on the same datas
 - Known issues / assumptions: warm local runs include PDO fetch overhead and uncontrolled background load; no production latency guarantee. Prefix still uses filesort. MariaDB automatically replaced standalone FK index with the supporting composite; rollback recreates the standalone index before dropping composite. EXPLAIN ANALYZE NOT RUN. Status: Awaiting Commit.
 - Follow-up verification: `php scripts/verify-index-rollback.php` passed on separate local DB `dorra_index_verify_20261029_115223`. Forward/rollback/reapply all exit 0; expected indexes verified, fixture count 1 and checksum 3758889467 unchanged, FK category deletion rejected with error 1451 after rollback. Browser smoke NOT RUN: local browser access disabled in Work settings. Phase 10 remains gated on user confirmation of Phase 09 commit.
 - Suggested commit message: `perf: index design search and compare plans`
-- User commit confirmation / hash: pending
+- User commit confirmation / hash: user confirmed; verified `59d770f`.

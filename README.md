@@ -1,199 +1,211 @@
 # Dorra — Design Library
 
-## Phase 01: local environment
+Standalone Laravel + Blade design library with local sample data, internal login,
+role-based authorization, prefix search, and a separate Admin management page.
+Uses standard server-rendered Blade navigation and forms. Search submissions
+target the filter section through a URL fragment, so the search bar is visible
+above results after page load. All detail/edit routes remain available.
 
-Verified on 2026-10-29: Laravel 12.70.2, PHP 8.2.12, Composer 2.7.9,
-Node 24.13.0, npm 11.7.0, MariaDB 10.4.32 (XAMPP).
-Installed Composer platform requirements pass. The assignment requests MySQL;
-local development currently uses MariaDB through Laravel's mysql driver.
-MySQL-specific behavior and performance have not been verified.
+## Verified environment
 
-The existing application and database are already configured. Keep the existing
-`.env` and application key. Run `php artisan migrate:status` to inspect migrations;
-the three initial migrations were already applied. Do not reset the database.
-Run `php artisan serve` from this directory to start local development.
+Observed on 2026-10-29: PHP 8.2.12, Laravel 12.70.2, Composer 2.7.9,
+Node 24.13.0, npm 11.7.0, MariaDB 10.4.32, Windows 11.
+The assignment specifies MySQL; the actual local verification uses MariaDB
+through Laravel's `mysql` driver. Oracle MySQL itself has NOT been tested.
+Use the committed `composer.lock`. `composer check-platform-reqs` passes locally.
+PHP needs PDO MySQL for the application and PDO SQLite for isolated tests, plus
+the extensions checked by Composer.
 
-For a separate fresh local setup, install the locked PHP dependencies with
-`composer install`, copy `.env.example` to `.env` only if `.env` does not exist,
-and replace the database placeholders with credentials for your own local sample
-database. Create that empty sample database first, run `php artisan key:generate`
-only for the new environment, then `php artisan migrate` and `php artisan serve`.
-These fresh-setup instructions have not been executed against a second database.
-Never commit `.env`. `.env.example` contains placeholders only.
-Frontend installation/build and browser verification have not been run in Phase 01.
+The Blade pages use local `public/css/library.css` and the bundled SVG directly.
+Node/npm and a Vite build are not required to run these pages. The repository
+retains the original optional Vite files; frontend build verification is NOT RUN.
 
-Phase 01 verification used an internal HTTP request returning 200 and confirmed
-CSRF middleware is enabled. See `docs/specs/01-environment-setup.md` for evidence.
-Authentication and library features belong to later phases.
+## New local setup
 
-## Phase 02: internal authentication
+Run from the repository directory. Keep an existing `.env` and application key;
+the copy/key-generation steps below are for a new installation only.
 
-Open `/login` after starting the server. Only login/logout are exposed; there is
-no public registration, password recovery or profile management.
+```powershell
+composer install
+composer check-platform-reqs
+Copy-Item .env.example .env
+```
 
-Local sample credentials only (never use these accounts on a deployed service):
+Create an **empty local sample database** in your database client:
+
+```sql
+CREATE DATABASE dorra_sample CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+Edit the untracked `.env` with your local DB host, port, database, username and
+password. `.env.example` contains placeholders, not working database credentials.
+Keep `APP_ENV=local`; set `APP_URL=http://127.0.0.1:8015` for this run command.
+Do not set a conflicting `DB_URL`. Then run:
+
+```powershell
+php artisan key:generate
+php artisan config:clear
+php artisan migrate
+php artisan db:seed --class=DesignLibrarySeeder
+php artisan serve --host=127.0.0.1 --port=8015
+```
+
+Open [the local login](http://127.0.0.1:8015/login).
+If the port is in use, select another port and update APP_URL accordingly.
+The application needs writable `storage` and `bootstrap/cache` directories.
+No external service, image upload, queue worker or storage symlink is required.
+Avoid the generic `composer setup` shortcut for an existing installation: its
+scaffold script generates a key and runs additional frontend setup.
+
+Fresh DB migration/seeding was verified with
+`php scripts/verify-fresh-setup.php`: 100000 designs, 12 categories, both accounts
+and password hashes valid. This verifies the database setup using installed
+dependencies; a separate clean-machine clone and dependency installation were
+NOT RUN. The helper creates a new timestamp-named local database and retains it.
+
+## Local sample accounts and permissions
+
+These credentials are public **local demo credentials only**. Never deploy them.
 
 | Role | Email | Password |
 |---|---|---|
 | Admin | admin@dorra.test | DorraSample123! |
 | Viewer | viewer@dorra.test | DorraSample123! |
 
-Run `php artisan migrate`, then `php artisan db:seed --class=SampleAccountSeeder`
-for the local sample accounts. The seeder is restricted to local/testing and
-resets these two sample accounts to the documented roles/passwords on repeat runs.
-Passwords are stored hashed. Existing unrelated users are retained and receive
-the viewer default when the role migration runs.
+Both roles can search/filter `/library` and view draft or published design
+details. Library cards and shared details are read-only. Admin uses
+`/admin/designs` (Manage designs link) for create/edit/delete, title-prefix search,
+and category/status filters that preserve parameters across pages. The management
+page includes a footer and viewport-height layout for short result lists.
+Viewer requests to
+the management page or write routes are rejected server-side with 403.
+Public registration, password recovery, user administration and uploads are
+intentionally unavailable. Policies and Form Requests enforce authorization and
+validation; Blade visibility is supplementary. Forms retain CSRF protection.
 
-Breeze 2.4.0 login controller and throttled Form Request are configured selectively
-with Blade views; the full scaffolder was not run, avoiding unused auth routes
-and frontend dependency replacements. The simple login shell needs no Vite build.
-`LibraryPolicy` controls access; `/library` requires authentication and read
-permission. Admin-only content uses the same policy in Blade. Design CRUD routes,
-write Form Requests, model policies and action links will be connected when those
-features are introduced in their assigned phases. Phase 02 tests use test-only
-write endpoints to verify that the policy middleware returns 403 for Viewer.
+To deliberately restore the two local account passwords/roles:
 
-Run `php artisan test` (SQLite in-memory, isolated from the local sample database).
-Phase 02 result: 11 tests passed, 60 assertions. Browser verification NOT RUN.
+```powershell
+php artisan db:seed --class=SampleAccountSeeder
+```
 
+## Sample dataset and reset behavior
 
-## Phase 04: reproducible local sample data
+`DesignLibrarySeeder` inserts 100000 deterministic designs in SQL batches of
+1000 inside one transaction, with 12 categories, Arabic/English titles, 50000
+drafts and 50000 published designs. Every design uses the same bundled
+`images/design-placeholder.svg`. `created_at` is DATETIME; each seeded date is
+shared by two designs. `updated_at` starts NULL until editing.
 
-Run `php artisan migrate`, then `php artisan db:seed --class=DesignLibrarySeeder`.
-The default `php artisan db:seed` now invokes this full sample seeder as well.
-Use only a local sample database, with design tables initially empty. The seeder
-rejects environments other than local/testing. Run offline with no concurrent
-writes or concurrent seeders. No automatic deletion/reset is performed.
+The seeder accepts an empty design table, skips an existing count of exactly
+100000, and refuses any other nonzero count. A count-only skip does not verify
+content or repair deleted/edited records. The full seeder also creates the demo
+accounts on an empty dataset; a count-only skip leaves accounts untouched.
+Run without concurrent writes or concurrent seeders. Default `php artisan
+db:seed` also calls this full sample seeder.
 
-On the first run it creates 12 categories, the two documented demo accounts and
-exactly 100,000 designs in 1,000-row SQL insert batches inside one transaction.
-On an empty design table it reuses matching category names and refreshes the two
-sample accounts. A failed insert rolls back all row changes; MySQL auto-increment
-IDs may still advance, so reproducibility concerns content, not identical IDs.
+Prefer a new empty local database for a fresh reproduction. If you intentionally
+want a full reset, the following command **permanently drops every table in the
+database selected by `.env`**. Back up data and verify that this is a disposable
+local sample database first. Never run it against existing valuable data.
 
-A run with exactly 100,000 existing designs is a no-op, including accounts and
-categories. This checks row count only, not content integrity or repairs. Any
-other nonzero design count is refused and preserved. For a new reproduction,
-configure a separate empty local sample database and migrate/seed there; retain
-the old database. Do not run destructive reset commands against existing data.
-Use `SampleAccountSeeder` separately if you intentionally need to restore the
-sample accounts after the dataset is complete.
+```powershell
+php artisan migrate:fresh --seed
+```
 
-Titles are deterministic, split evenly between `Design sample 000001` style and
-Arabic `تصميم تجريبي 000002` style. Statuses are 50,000 draft / 50,000 published.
-Each category receives both languages and statuses. There are 50,000 distinct
-creation dates from 2025-01-01 00:00:00 to 2025-12-14 05:10:00, each repeated twice.
-All rows use `images/design-placeholder.svg`, shipped in public/images.
-`updated_at` is NULL until an edit: this avoids local TIMESTAMP daylight-saving
-conversion rejecting a historical sample time; `created_at` is DATETIME.
+That destructive reset was NOT executed during final verification. The current
+performance dataset includes one user-approved replacement sample row after a
+manual delete; see the performance report. Preserve that dataset for reproducing
+the recorded comparison rather than reseeding it.
 
-Measured 2026-10-29 on local MariaDB 10.4.32: first successful project seed
-5.241 seconds, peak allocated PHP memory 62.00 MiB for that process. Independent
-empty verification database: 5.139 seconds, 56.00 MiB. These are seeding metrics,
-not query-performance benchmarks or total development time. Counts, title
-samples and a content checksum matched across both databases.
+## Search behavior
 
-Normal feature tests use a 28-row / 7-row-batch subclass on isolated SQLite,
-never the 100,000-row seeder. Full suite: 22 tests passed / 93 assertions.
-See docs/specs/04-sample-data.md for actual SQL and failure/retry evidence.
+The user selected **title prefix** search. Examples on a freshly seeded dataset:
 
+- `Design sample 099` matches `Design sample 099999`.
+- `تصميم تجريبي 099` matches `تصميم تجريبي 099998`.
+- `sample` does not match `Design sample 099999`; this is not substring search.
 
-## Phase 05: library listing and title prefix search
+Category and status filters combine with AND. Search is bound SQL LIKE with
+`ESCAPE '!'`: literal `%`, `_`, and `!` are escaped; backslash remains literal.
+Laravel trims leading/trailing input whitespace. Prefix matching has no
+whole-word boundary or fuzzy spelling behavior.
 
-Open `/library` after login. Both Admin and Viewer can browse draft and published
-designs. The responsive Blade UI provides a title prefix search, category/status
-filters (combined with AND), clear action, empty state and field-level errors.
-Query parameters: `title`, `category_id`, `status`, `page`; title max 255 characters.
-Invalid browser query parameters redirect to the clean library URL with errors;
-JSON validation uses Laravel's normal 422 response. Blank filters are ignored.
+The verified title collation is `utf8mb4_unicode_ci` on MariaDB 10.4.32.
+Recorded probes: Design/design and Café/Cafe matched; أمل/امل and تَصميم/تصميم did
+not. Arabic normalization and diacritic removal are not implemented. Variants
+depend on the database collation; SQLite tests alone do not establish MySQL or
+MariaDB collation behavior. A dedicated search service would make sense only if
+future requirements need fuzzy/full-text/relevance features beyond this scope.
 
-Prefix search was explicitly approved by the user: `Design` matches titles
-starting with Design; `sample` does not match Design sample. `تصميم` matches
-تصميم تجريبي. Leading/trailing input whitespace is trimmed by Laravel. This is
-neither whole-word nor substring/fuzzy search. SQL uses a bound pattern plus
-`ESCAPE '!'`; !, % and _ are escaped and backslash stays literal. Literal-symbol
-queries were verified on MariaDB in normal and NO_BACKSLASH_ESCAPES session modes.
+Results use `created_at DESC, id DESC`, 24 per page. `id` is the tie-breaker when
+dates match. Filter parameters persist across pages; Clear filters resets the
+URL. Count and pagination run in the database; categories are eager-loaded.
 
-Actual title collation: utf8mb4_unicode_ci on MariaDB 10.4.32. Direct probes:
-Design/design and Café/Cafe match; أمل/امل and تَصميم/تصميم do not. No custom Arabic
-normalization or diacritic removal is applied; other variants depend on database
-collation. SQLite tests do not prove MariaDB collation behavior; MySQL itself
-has not been tested. A future Arabic normalization decision would change search
-semantics and should be discussed separately.
+## Tests and performance evidence
 
-Results order by created_at DESC, id DESC, 24 per page, with query parameters
-preserved. Eager loading fetches categories in one query instead of one per card.
-A live request against the 100,000-row local dataset returned HTTP 200 and exactly
-24 cards. Captured SQL shows count + LIMIT 24/OFFSET page + category queries;
-no full-dataset materialization. No performance index was added; speed benchmarks
-remain in Phases 08/09. CRUD and detail pages belong to Phase 06.
+```powershell
+php artisan test
+vendor\bin\pint --test
+git diff --check
+```
 
-Verification: 29 tests / 144 assertions passed. Browser smoke checks covered
-Admin/Viewer login, Arabic combined filters, next page preserving filters, reset,
-empty results and sign out. Desktop 1365×900 and mobile 390×844 inspected, with
-no horizontal overflow in DOM measurements. Styles are local public/css/library.css,
-with no CDN, JavaScript framework or build requirement. Shared layout styling also
-updates the existing login shell. This is a smoke check, not a full accessibility
-audit or exhaustive browser matrix.
+Latest server run: **38 tests passed / 224 assertions** (2.41s).
+`vendor\bin\pint --test` and `git diff --check` passed. The temporary SPA
+enhancement and its tests were removed at the user's request.
+Feature tests use `RefreshDatabase` and SQLite `:memory:` configured in
+`phpunit.xml`, with small factories. Seeder tests use a bounded small subclass,
+not the 100000-row fixture. Tests cover authorization, CRUD, validation, Arabic
+and English prefix search, wildcard literals, filters, empty results, ordering,
+page size and query parameter preservation.
 
----
+[Performance evidence](docs/performance.md) records actual SQL/bindings,
+EXPLAIN, machine/settings, raw repeated timings and limitations. Local medians:
 
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+| Query | Before indexes | After indexes |
+|---|---|---|
+| Category + status, newest first | 33.3196 ms | 0.9214 ms |
+| Title prefix, newest first | 108.8212 ms | 2.3891 ms |
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+New BTREE indexes: `(category_id, status, created_at, id)` and `title`, delivered
+in a separate migration. These are warm local database/fetch measurements,
+not HTTP timings or production guarantees. Prefix search still needs filesort.
+The report explains storage/write costs and one-million-row constraints such as
+deep OFFSET, COUNT overhead and possible cursor pagination.
 
-## About Laravel
+`php scripts/performance-baseline.php` reruns the fixed read-only measurement on
+the configured local 100000-row database. Its category id 13 and prefix parameters
+match the historical benchmark, not necessarily a newly seeded database's ids.
+`php scripts/verify-index-rollback.php` creates a separate small local database,
+verifies rollback/reapplication and FK preservation, and retains it for inspection.
+These helpers require permission to CREATE DATABASE when creating verification DBs.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Handoff, scope and outstanding verification
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+See [execution ledger](docs/PLAN.md) and individual [phase specs](docs/specs/).
+Phases 01–09 have verified user commits. Phase 10 awaits final user review/commit.
+No commits or pushes are made automatically.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Total hands-on development effort was **not tracked**, so an actual total cannot
+be reconstructed reliably and no 4–6 hour estimate is presented as fact.
+Recorded command durations are measurements of those commands only, not effort.
+Work/evidence is dated 2026-10-29; Git timestamps are not timesheets.
 
-## Learning Laravel
+Browser access was restored on 2026-10-29. Live checks on port 8000 verified
+Viewer Arabic prefix + Branding/Published (21 results), empty results/reset,
+English prefix (500 results), page 2 preserving the prefix (24 cards), and Viewer
+403 on the Admin route. Admin login, management filters (21 results), loaded
+thumbnails, footer and create form were checked. Filter position settled at
+approximately 16px below viewport top with computed smooth scroll. No horizontal
+overflow at the observed 866x715 viewport. Live create/update/delete submissions,
+final mobile viewport checks and exhaustive visual testing remain NOT RUN;
+write behavior is covered by isolated automated tests. Use a disposable sample
+database for live write tests to preserve the performance dataset.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Oracle MySQL verification, clean-machine dependency installation, optional
+frontend build, production deployment and exhaustive accessibility/browser
+testing remain NOT RUN. Current verification is local MariaDB plus isolated
+SQLite tests. No paid service or external search engine is used.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Never commit `.env`, application keys or database credentials. Only the documented
+local sample login credentials are intentionally public in this repository.

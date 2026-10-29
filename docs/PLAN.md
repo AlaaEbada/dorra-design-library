@@ -15,8 +15,8 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 | 06 | [Design CRUD](specs/06-design-crud.md) | 05 | Done | User confirmed commit; verified `0db04ab`. |
 | 07 | [Feature Tests](specs/07-feature-tests.md) | 06 | Done | User confirmed commit; verified `fc3bbe0`. |
 | 08 | [Performance Baseline](specs/08-performance-baseline.md) | 07 | Done | User confirmed commit; verified 34cdacb. |
-| 09 | [Indexes & Performance Comparison](specs/09-indexes-comparison.md) | 08 | Awaiting Commit | Index measurement documented; 36 tests / 209 assertions passed. Separate MariaDB rollback/reapply and FK preservation verified. Browser access disabled; awaiting user commit. |
-| 10 | [README & Final Verification](specs/10-readme-handoff.md) | 09 | Pending | — |
+| 09 | [Indexes & Performance Comparison](specs/09-indexes-comparison.md) | 08 | Done | User confirmed commit; verified 59d770f. |
+| 10 | [README & Final Verification](specs/10-readme-handoff.md) | 09 | Awaiting Commit | 38 tests / 224 assertions; partial live browser smoke passed on 8000 (both role read journeys, filters, Viewer 403, Admin thumbnails/footer/create form). SPA removed. Live write/mobile and Oracle MySQL checks outstanding; effort untracked. |
 
 ## Critical dependency constraints
 - Keep extra performance indexes **out of Phase 03** so Phase 08 measures baseline on the identical 100,000-record dataset before Phase 09.
@@ -61,10 +61,25 @@ Browser, frontend build and separate fresh setup NOT RUN.
 
 ## Final release gates
 - [ ] Phase 01–10 acceptance criteria independently verified.
-- [ ] 100,000-row local sample dataset reproducible; admin and viewer accounts confirmed.
-- [ ] SQL, EXPLAIN and repeated before/after index measurements documented with real outputs.
-- [ ] Actual feature-test command and results recorded.
-- [ ] README and `.env.example` reviewed; credentials are sample-only; no secrets.
+- [x] 100,000-row local sample dataset reproducible; admin and viewer accounts confirmed.
+- [x] SQL, EXPLAIN and repeated before/after index measurements documented with real outputs.
+- [x] Actual feature-test command and results recorded.
+- [x] README and `.env.example` reviewed; credentials are sample-only; limited secret-pattern and tracked-file checks passed.
 - [ ] User confirms final commit/repository delivery.
 
 Phase 01 commit confirmed by user and verified with git log/show: c28ce8482edd8a69101f7fa1b0dbab7a553b3add. User authorized Phase 02.
+
+## Phase 10 handoff verification — 2026-10-29
+
+Phase 09 commit user-confirmed and verified: 59d770f. New standalone README
+replaces historical/incomplete setup notes. Separate database
+dorra_handoff_verify_20261029_115407 successfully migrated and seeded 100000
+designs / 12 categories / 50000 per status; both local demo account roles and
+password hashes checked. Seed reported 6.684s and 48.00 MiB allocated peak.
+Platform requirements passed; tests 36 passed / 209 assertions in 2.49s;
+Pint passed; seven local migrations Ran and 12 routes verified.
+Final browser smoke remains unavailable (browser control disabled); clean-machine
+install, Oracle MySQL and optional frontend build NOT RUN. Actual total effort
+was not tracked, so that Phase 10 task and the aggregate acceptance gate remain
+unchecked. Limited secret-pattern search found no candidates; .env ignored and
+not tracked. Phase 10 awaits final user review/commit; no automatic commit made.

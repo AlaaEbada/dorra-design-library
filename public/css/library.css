@@ -11,12 +11,24 @@
     box-sizing:border-box
 }
 
+html {
+    scroll-behavior:smooth
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior:auto
+    }
+}
+
 body {
     margin:0;
     background:var(--paper);
     color:var(--ink);
     font:14px/1.6 "Segoe UI",Arial,sans-serif
 }
+
+.filter-panel { scroll-margin-top: 16px; }
 
 a {
     color:inherit
@@ -616,6 +628,10 @@ input::placeholder {
 button:disabled { opacity: .45; cursor: not-allowed; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .admin-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; padding: 45px 0 28px; }
+.admin-shell { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; }
+.admin-shell > .topbar { flex-shrink: 0; }
+.admin-content { flex: 1; padding-bottom: 8px; }
+.admin-shell .site-footer { margin-top: 24px; padding: 24px 0; }
 .admin-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
 .admin-table { width: 100%; min-width: 760px; border-collapse: collapse; text-align: left; }
 .admin-table th, .admin-table td { padding: 17px 20px; border-bottom: 1px solid var(--line); vertical-align: middle; }

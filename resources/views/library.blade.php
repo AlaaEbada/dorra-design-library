@@ -7,8 +7,8 @@
     <div><p class="eyebrow">A SPACE FOR CREATIVE WORK</p><h1 id="page-title">The design collection<span>.</span></h1><p class="intro-copy">Explore ideas, find inspiration, and make room for your next great design.</p></div>
     <div class="collection-note"><span class="note-mark" aria-hidden="true">✳</span><p>Thoughtfully collected.<br>Ready to inspire.</p></div>
 </section>
-<section class="filter-panel" aria-label="Search and filters">
-    <form method="GET" action="{{ route('library') }}" class="filters">
+<section id="search-filters" class="filter-panel" aria-label="Search and filters">
+    <form method="GET" action="{{ route('library') }}#search-filters" class="filters">
         <div class="search-field"><label for="title">Search the collection</label><input id="title" name="title" type="search" maxlength="255" value="{{ $filters['title'] ?? '' }}" placeholder="Start typing a design title…" aria-describedby="search-hint @error('title') title-error @enderror">@error('title')<p id="title-error" class="error" role="alert">{{ $message }}</p>@enderror</div>
         <div><label for="category_id">Category</label><select id="category_id" name="category_id"><option value="">All categories</option>@foreach($categories as $category)<option value="{{ $category->id }}" @selected(($filters['category_id'] ?? '') == $category->id)>{{ $category->name }}</option>@endforeach</select>@error('category_id')<p class="error" role="alert">{{ $message }}</p>@enderror</div>
         <div><label for="status">Status</label><select id="status" name="status"><option value="">All statuses</option>@foreach(\App\Enums\DesignStatus::cases() as $status)<option value="{{ $status->value }}" @selected(($filters['status'] ?? '') === $status->value)>{{ ucfirst($status->value) }}</option>@endforeach</select>@error('status')<p class="error" role="alert">{{ $message }}</p>@enderror</div>
