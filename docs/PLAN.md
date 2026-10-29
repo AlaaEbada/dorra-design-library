@@ -13,8 +13,8 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 | 04 | [Sample Data](specs/04-sample-data.md) | 03 | Done | User approved continuation after verified commit 8bd0025; 100k dataset evidence in Phase 04. |
 | 05 | [Listing & Search](specs/05-listing-search.md) | 04 | Done | User approved continuation after commit 4901b19; git log verified; clean worktree before Phase 06. |
 | 06 | [Design CRUD](specs/06-design-crud.md) | 05 | Done | User confirmed commit; verified `0db04ab`. |
-| 07 | [Feature Tests](specs/07-feature-tests.md) | 06 | Awaiting Commit | Isolated feature coverage verified; awaiting user review/commit. |
-| 08 | [Performance Baseline](specs/08-performance-baseline.md) | 07 | Pending | — |
+| 07 | [Feature Tests](specs/07-feature-tests.md) | 06 | Done | User confirmed commit; verified `fc3bbe0`. |
+| 08 | [Performance Baseline](specs/08-performance-baseline.md) | 07 | Awaiting Commit | 100000 rows; original indexes, SQL/bindings, EXPLAIN and ten timings/query recorded in docs/performance.md; awaiting review/commit. |
 | 09 | [Indexes & Performance Comparison](specs/09-indexes-comparison.md) | 08 | Pending | — |
 | 10 | [README & Final Verification](specs/10-readme-handoff.md) | 09 | Pending | — |
 
@@ -41,6 +41,8 @@ Read `../AGENTS.md`, then the next phase spec. The Agent updates checkboxes **on
 | 2026-10-29 | 06 | CRUD resource routes, Form Requests, explicit policy registration, separate `/admin/designs` dashboard with thumbnail rows and card-scoped status badges, shared placeholder thumbnail, and isolated `DesignCrudTest`; 36 tests / 209 assertions, Pint and diff check passed | Browser smoke unavailable because local browser control is disabled in Work settings; awaiting user review/commit | Awaiting user commit |
 | 2026-10-29 | 06 | User confirmed commit and authorized Phase 07; `0db04ab` verified with git log | None | `0db04ab` verified |
 | 2026-10-29 | 07 | `php artisan test` passed: 36 tests / 209 assertions in 2.25s; isolated SQLite in-memory configuration and required role/CRUD/search/listing coverage verified | No blocker; awaiting user review/commit | Awaiting user commit |
+| 2026-10-29 | 07 | User confirmed commit and authorized Phase 08; `fc3bbe0` verified with git log | None | `fc3bbe0` verified |
+| 2026-10-29 | 08 | Initial read-only count found 99999; user subsequently approved one replacement sample record (133001), restoring 100000. Baseline recorded with checksum 3289254657: category/status median 33.3196 ms; prefix median 108.8212 ms; ten runs each, EXPLAIN and PK/FK indexes documented. Phase 06/07 regression tests: 36 passed / 209 assertions; Pint passed | No blocker; preserve dataset for Phase 09 | Awaiting user commit |
 
 ## Phase 01 follow-up (2026-10-29)
 

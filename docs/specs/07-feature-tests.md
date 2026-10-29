@@ -39,4 +39,4 @@ Add executable tests on small isolated fixtures (not the 100k dataset).
 - Files changed: this feature-test completion record and `docs/PLAN.md`. Required executable scenarios already existed in `tests/Feature/AuthorizationTest.php`, `tests/Feature/DesignCrudTest.php`, and `tests/Feature/DesignListingTest.php`.
 - Known issues / assumptions: `phpunit.xml` forces `DB_CONNECTION=sqlite` and `DB_DATABASE=:memory:`; relevant feature classes use `RefreshDatabase`. `SampleDataTest` only invokes the bounded test configuration of its seeder, never the 100,000-row production sample dataset.
 - Suggested commit message: `test: cover library roles CRUD and search`
-- User commit confirmation / hash: pending
+- User commit confirmation / hash: user confirmed; verified `fc3bbe0` (`docs: record verified feature-test coverage`).
